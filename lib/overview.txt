@@ -1,0 +1,11 @@
+Active Tile
+Active Edge
+"cursors"
+
+Scene/Canvas
+
+tile groups
+
+doesn't detect overlaps!
+
+keep track of operations, clear/replay to load/undo

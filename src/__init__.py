@@ -1,0 +1,2 @@
+
+from trisq import TriSq
