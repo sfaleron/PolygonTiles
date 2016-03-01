@@ -55,6 +55,8 @@ def make_tile(tile, edge, shape):
 
    parent_side = edge.what_side(other)
 
+   # note the slope computed is for the perpendicular
+
    denom = p1.y - p2.y
 
    m = None if abs(denom) < EPS else (p2.x-p1.x) / denom

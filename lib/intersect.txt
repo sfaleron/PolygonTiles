@@ -1,0 +1,58 @@
+
+Find the intersection of two lines given a pair of points defining each,
+using the Mathomatic computer algebra system.
+
+From the determinant form of linear equation
+
+(x* y1) + (y* x2) + ( x1* y2) - ( y1* x2) - (y* x1) - (x* y2) = 0
+
+Substitute edge endpoints, solve for x,y
+
+(x*p1y) + (y*p2x) + (p1x*p2y) - (p1y*p2x) - (y*p1x) - (x*p2y) = 0
+
+    ((p2x*p1y) + (y*(p1x - p2x)) - (p1x*p2y))
+x = -----------------------------------------
+                   (p1y - p2y)
+
+    ((x*(p2y - p1y)) - (p2y*p1x) + (p1y*p2x))
+y = -----------------------------------------
+                   (p2x - p1x)
+
+
+(x*q1y) + (y*q2x) + (q1x*q2y) - (q1y*q2x) - (y*q1x) - (x*q2y) = 0
+
+    ((q1y*q2x) - (y*(q2x - q1x)) - (q2y*q1x))
+x = -----------------------------------------
+                   (q1y - q2y)
+
+    ((x*(q2y - q1y)) - (q2y*q1x) + (q1y*q2x))
+y = -----------------------------------------
+                   (q2x - q1x)
+
+
+Combine, solve for x, y
+
+((p1y*p2x) - (y*(p2x - p1x)) - (p2y*p1x))   ((q1y*q2x) - (y*(q2x - q1x)) - (q2y*q1x))
+----------------------------------------- = -----------------------------------------
+               (p1y - p2y)                                 (q1y - q2y)
+
+    ((((p2y*p1x) - (p1y*p2x))*(q1y - q2y)) + (((q1y*q2x) - (q2y*q1x))*(p1y - p2y)))
+y = -------------------------------------------------------------------------------
+                (((p1x - p2x)*(q1y - q2y)) + ((q2x - q1x)*(p1y - p2y)))
+
+y = ((((p2y*p1x) - (p1y*p2x))*(q1y - q2y)) + (((q1y*q2x) - (q2y*q1x))*(p1y - p2y)))/(((p1x - p2x)*(q1y - q2y)) + ((q2x - q1x)*(p1y - p2y)))
+
+
+((x*(p2y - p1y)) - (p2y*p1x) + (p1y*p2x))   ((x*(q2y - q1y)) - (q2y*q1x) + (q1y*q2x))
+----------------------------------------- = -----------------------------------------
+               (p2x - p1x)                                 (q2x - q1x)
+
+    ((((p2y*p1x) - (p1y*p2x))*(q2x - q1x)) + (((q1y*q2x) - (q2y*q1x))*(p2x - p1x)))
+x = -------------------------------------------------------------------------------
+                (((p2y - p1y)*(q2x - q1x)) + ((q1y - q2y)*(p2x - p1x)))
+
+x = ((((p2y*p1x) - (p1y*p2x))*(q2x - q1x)) + (((q1y*q2x) - (q2y*q1x))*(p2x - p1x)))/(((p2y - p1y)*(q2x - q1x)) + ((q1y - q2y)*(p2x - p1x)))
+
+
+One sufficies to check that the intersection lies on both edges, the other can be discarded.
+

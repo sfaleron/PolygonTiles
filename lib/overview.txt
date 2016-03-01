@@ -5,7 +5,3 @@ Active Edge
 Scene/Canvas
 
 tile groups
-
-doesn't detect overlaps!
-
-keep track of operations, clear/replay to load/undo

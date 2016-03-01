@@ -7,8 +7,8 @@ sign = lambda x: int(copysign(1.0, x))
 
 from options import *
 
-Point = namedtuple('Point', ( 'x',  'y'))
-_Edge = namedtuple('_Edge', ('p1', 'p2'))
+_Point = namedtuple('Point', ( 'x',  'y'))
+_Edge  = namedtuple( 'Edge', ('p1', 'p2'))
 
 def scale_to_ints(pt):
    return (int(round(pt.x*2**20, 0)), int(round(pt.y*2**20, 0)))
@@ -16,6 +16,11 @@ def scale_to_ints(pt):
 def centroid(*pts):
    xs, ys = zip(*pts)
    return Point(sum(xs) / len(pts), sum(ys) / len(pts))
+
+
+class Point(_Point):
+   def __eq__(self, other):
+      return scale_to_ints(self) == scale_to_ints(other)
 
 class Edge(_Edge):
    def __new__(cls, cvs, p1, p2, cleanup=None):
@@ -37,6 +42,7 @@ class Edge(_Edge):
 
    def activate(self):
       self.cvs.itemconfigure(self.id_, state='normal')
+      self.cvs.tag_raise(self.id_)
 
    def deactivate(self):
       self.cvs.itemconfigure(self.id_, state='hidden')
@@ -76,15 +82,63 @@ class Edge(_Edge):
 
       return sign(side)
 
-class Tile(object):
-   def __init__(self, cvs, pts, edges, active = True):
+   # assumes edges are not duplicated (parallel edges that are colinear do not intersect)
+   # returns true if edges intersect
+   def intersect_check(self, other):
+      p1, p2 = self
+      q1, q2 = other
+
+      if p2.x < p1.x:
+         p1, p2 = p2, p1
+
+      if q2.x < q1.x:
+         q1, q2 = q2, q1
+
+      denom = p2.x - p1.x
+
+      mp = None if abs(denom) < EPS else (p2.y-p1.y) / denom
+
+      denom = q2.x - q1.x
+
+      mq = None if abs(denom) < EPS else (q2.y-q1.y) / denom
+
+      # if the edges share an endpoint, that's an okay intersection
+      if p1 == q1 or p1 == q2 or p2 == q1 or p2 == q2:
+         return False
+
+      # both edges are vertical
+      if mp is None and mq is None:
+         return False
+
+      # neither side is vertical, but they are parallel
+      if not mp is None and not mq is None:
+         if abs(mp - mq) < EPS:
+            return False
+
+      # the lines defined by each edge do intersect, but perhaps not on the edges
+      # only one coordinate is necessary
+
+      x = ( ( (p2.y*p1.x - p1.y*p2.x)*(q2.x - q1.x) + (q1.y*q2.x - q2.y*q1.x)*(p2.x - p1.x) ) /
+          ( (p2.y - p1.y)*(q2.x - q1.x) + (q1.y - q2.y)*(p2.x - p1.x) ) )
+
+      #y = ( ( (p2.y*p1.x - p1.y*p2.x)*(q1.y - q2.y) + (q1.y*q2.x - q2.y*q1.x)*(p1.y - p2.y) ) /
+      #    ( (p1.x - p2.x)*(q1.y - q2.y) + (q2.x - q1.x)*(p1.y - p2.y) ) )
+
+      if p1.x < x < p2.x and q1.x < x < q2.x:
+         return True
+
+      return False
+
+class Tile(tuple):
+   def __new__(cls, cvs, pts, edges):
+      self = super(Tile, cls).__new__(cls, edges)
+
       self.cvs = cvs
       self.group = None
-      self.edges = edges
       self.selected = False
       self.pts = set(pts)
 
-      for e in edges:
+      for e in self:
          e.add_tile(self)
 
       self.id_ = cvs.create_polygon(*pts, **{'fill':FILL, 'outline':EDGE})
@@ -96,6 +150,8 @@ class Tile(object):
 
       self.csrid = cvs.create_polygon(*csrpts, **{'fill':CURSOR, 'state':'hidden'})
 
+      return self
+
    def activate(self):
       self.cvs.itemconfigure(self.csrid, state='normal')
 
@@ -106,7 +162,7 @@ class Tile(object):
       self.cvs.delete(self.csrid)
       self.cvs.delete(self.id_)
 
-      for e in self.edges:
+      for e in self:
          e.remove_tile(self)
 
 __all__  = ('Point', 'Edge', 'Tile', 'centroid')

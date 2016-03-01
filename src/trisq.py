@@ -44,6 +44,9 @@ class TriSq(tk.Frame):
       status['t'] = w = StatusItem(fr, 'Triangles:', padx=6)
       w.grid(row=0, column=1, sticky='w')
 
+      status['e'] = w = StatusItem(fr, 'Exposed Edges:', padx=6)
+      w.grid(row=0, column=2, sticky='w')
+
       status['g'] = w = StatusItem(fr, 'Group:')
       w.grid(row=0, column=3, sticky='e')
 
@@ -52,10 +55,26 @@ class TriSq(tk.Frame):
       fr.columnconfigure(2, weight=1)
 
    def new_tile(self, shape):
-      tile = self.active_tile
-      edge = tile.edges[self.active_edge]
+      state = self.state
 
-      newtile = self.add_tile(make_tile(tile, edge, shape))
+      tile  = state['tile']
+
+      edge  = tile[state['edge']]
+
+      if edge.tile2:
+         print 'edge full!'
+         return None
+
+      rawedges = make_tile(tile, edge, shape)
+
+      for e1 in rawedges:
+         if not Edge.signature(*e1) in state['edges']:
+            for e2 in state['edges'].itervalues():
+               if e2.intersect_check(e1):
+                  print 'overlap!'
+                  return None
+
+      newtile = self.add_tile(rawedges)
 
       self.cvs.tag_raise(edge.id_)
 
@@ -77,16 +96,20 @@ class TriSq(tk.Frame):
       return tile
 
    def select_tile(self, newtile):
-      tile = self.active_tile
-      self.active_tile = newtile
-      edge = tile.edges[self.active_edge]
+      state = self.state
+
+      tile  = state['tile']
+
+      edge  = tile[state['edge']]
+
+      state['tile'] = newtile
 
       tile.deactivate()
       newtile.activate()
 
-      for e in range(len(newtile.edges)):
-         if newtile.edges[e] == edge:
-            self.active_edge = e
+      for e in range(len(newtile)):
+         if newtile[e] == edge:
+            state['edge'] = e
 
    def add_edge(self, p1, p2):
 
@@ -111,29 +134,47 @@ class TriSq(tk.Frame):
       edges.pop(sign)
 
    def prev_edge(self):
-      edges = self.active_tile.edges
-      i  = self.active_edge
+      state = self.state
+
+      edges = state['tile']
+      i = state['edge']
 
       edges[i].deactivate()
 
-      self.active_edge = \
+      state['edge'] = \
       i = (i-1) % len(edges)
 
       edges[i].activate()
 
    def next_edge(self):
-      edges = self.active_tile.edges
-      i  = self.active_edge
+      state = self.state
+
+      edges = state['tile']
+      i = state['edge']
 
       edges[i].deactivate()
 
-      self.active_edge = \
+      state['edge'] = \
       i = (i+1) % len(edges)
 
       edges[i].activate()
 
    def make_edges(self, rawedges):
       return [self.add_edge(*i) for i in rawedges]
+
+   def do_delete_single(self):
+      state = self.state
+      tile  = state['tile']
+      edge  = tile[state['edge']]
+
+      rmtile = edge.tile2 if edge.tile1 == tile else edge.tile1
+
+      if rmtile:
+         state['tiles'].remove(rmtile)
+         rmtile.delete()
+
+      else:
+         print 'no tile to delete'
 
    # tile0 is "q" or "t"
    def __init__(self, parent, shape0, exitfxn=None):
@@ -146,13 +187,13 @@ class TriSq(tk.Frame):
       self.rowconfigure(0, weight=1)
       self.columnconfigure(0, weight=1)
 
-      self.state = { 'tiles' : set(), 'edges': {}, 'q': 0, 't': 0 }
+      self.state = {
+         'tiles' : set(), 'edges' : {}, 'q': 0,
+         'tile'  :  None, 'edge'  :  0, 't': 0
+      }
 
-      tile0 = self.add_tile(do_start_tile(shape0))
+      self.state['tile'] = tile0 = self.add_tile(do_start_tile(shape0))
 
-      self.active_tile = tile0
-      self.active_edge = 0
-
-      tile0.edges[0].activate()
+      tile0[0].activate()
 
       tile0.activate()

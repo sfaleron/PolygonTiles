@@ -19,17 +19,16 @@ def do_key(host, e):
 
    print e.keysym
 
+   state = host.state
+
    # new tile
    # hold shift to keep active tile
    # otherwise new tile becomes active
    if   e.keysym in ('q', 't'):
-      tile = host.active_tile
-      edge = tile.edges[host.active_edge]
+      newtile = host.new_tile(e.keysym)
 
-      if not edge.tile2:
-         host.select_tile(host.new_tile(e.keysym))
-      else:
-         print 'full'
+      if newtile:
+         host.select_tile(newtile)
 
    # edges, ccw
    # hold shift to rotate scene fifteen degrees
@@ -42,9 +41,11 @@ def do_key(host, e):
       host.next_edge()
 
    # set active tile to tile across active edge
-   elif e.keysym in ('Up', 'Down'):
+   elif e.keysym == 'space':
 
-      edge    = host.active_tile.edges[host.active_edge]
+      tile = state['tile']
+
+      edge = tile[state['edge']]
 
       newtile = edge.tile2 if edge.tile1 == tile else edge.tile1
 
@@ -66,9 +67,10 @@ def do_key(host, e):
    elif e.keysym in ('Control_R', 'Control_L'):
       pass
 
-   # delect selected tiles
+   # delete the tile across active edge,
+   # shift deletes selected tiles
    elif e.keysym == 'Delete':
-      pass
+      host.do_delete_single()
 
    # undo, hold shift to redo
    elif e.keysym == 'BackSpace':
