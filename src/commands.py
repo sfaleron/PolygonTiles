@@ -17,6 +17,13 @@ def do_key(host, e):
    # can't pan around if canvas too small
    # load/save would make that less interesting
 
+   shifty = bool(e.state&1)
+
+   keysym = e.keysym
+
+   if shifty:
+      print 'shift',
+
    print e.keysym
 
    state = host.state
@@ -24,24 +31,24 @@ def do_key(host, e):
    # new tile
    # hold shift to keep active tile
    # otherwise new tile becomes active
-   if   e.keysym in ('q', 't'):
+   if   keysym.lower() in ('q', 't'):
       newtile = host.new_tile(e.keysym)
 
-      if newtile:
-         host.select_tile(newtile)
+      if newtile and not shifty:
+         host.activate_tile(newtile)
 
    # edges, ccw
    # hold shift to rotate scene fifteen degrees
-   elif e.keysym == 'Left':
+   elif keysym == 'Left':
       host.prev_edge()
 
    # edges, cw
    # hold shift to rotate scene fifteen degrees
-   elif e.keysym == 'Right':
+   elif keysym == 'Right':
       host.next_edge()
 
    # set active tile to tile across active edge
-   elif e.keysym == 'space':
+   elif keysym =='KP_Insert':
 
       tile = state['tile']
 
@@ -50,32 +57,35 @@ def do_key(host, e):
       newtile = edge.tile2 if edge.tile1 == tile else edge.tile1
 
       if newtile:
-         host.select_tile(newtile)
+         host.activate_tile(newtile)
 
    # center view on active tile
    # hold shift to recenter canvas on the active tile
-   elif e.keysym == 'c':
+   elif keysym == 'c':
       pass
 
    # exit program
-   elif e.keysym == 'Escape':
+   elif keysym == 'Escape':
       f = host.exitfxn
       if callable(f):
          f()
 
    # (un)select active tile
-   elif e.keysym in ('Control_R', 'Control_L'):
-      pass
+   elif keysym in ('Control_R', 'Control_L'):
+      state['tile'].select_toggle()
 
    # delete the tile across active edge,
    # shift deletes selected tiles
-   elif e.keysym == 'Delete':
-      host.do_delete_single()
+   elif keysym == 'Delete':
+      if shifty:
+         host.do_delete_many()
+      else:
+         host.do_delete_single()
 
    # undo, hold shift to redo
-   elif e.keysym == 'BackSpace':
+   elif keysym == 'BackSpace':
       pass
 
    # show help window
-   elif e.keysym in ('h', 'question', 'F1'):
+   elif keysym in ('h', 'question', 'F1'):
       pass

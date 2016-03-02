@@ -95,7 +95,7 @@ class TriSq(tk.Frame):
 
       return tile
 
-   def select_tile(self, newtile):
+   def activate_tile(self, newtile):
       state = self.state
 
       tile  = state['tile']
@@ -107,9 +107,9 @@ class TriSq(tk.Frame):
       tile.deactivate()
       newtile.activate()
 
-      for e in range(len(newtile)):
-         if newtile[e] == edge:
-            state['edge'] = e
+      for i in range(len(newtile)):
+         if newtile[i] == edge:
+            state['edge'] = i
 
    def add_edge(self, p1, p2):
 
@@ -175,6 +175,36 @@ class TriSq(tk.Frame):
 
       else:
          print 'no tile to delete'
+
+   def do_delete_many(self):
+      state    = self.state
+
+      alltiles = state['tiles']
+      rmtiles  = [t for t in alltiles if t.selected]
+
+      if len(alltiles) == len(rmtiles):
+         print 'at least one tile must remain!'
+         return
+
+      oh_noes = False
+
+      for tile in rmtiles:
+         if tile  == state['tile']:
+            print 'oh noes!'
+            oh_noes = True
+
+         alltiles.remove(tile)
+         tile.delete()
+
+      if oh_noes:
+         tile = alltiles.copy().pop()
+         state['tile'] = tile
+         state['edge'] = 0
+
+         tile[0].activate()
+
+         tile.activate()
+
 
    # tile0 is "q" or "t"
    def __init__(self, parent, shape0, exitfxn=None):

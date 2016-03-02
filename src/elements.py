@@ -152,6 +152,10 @@ class Tile(tuple):
 
       return self
 
+   def select_toggle(self):
+      self.selected = not self.selected
+      self.cvs.itemconfigure(self.id_, fill=SELECTED if self.selected else FILL)
+
    def activate(self):
       self.cvs.itemconfigure(self.csrid, state='normal')
 
