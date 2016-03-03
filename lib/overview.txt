@@ -2,6 +2,8 @@ Active Tile
 Active Edge
 "cursors"
 
-Scene/Canvas
+mouse click to change active tile discontinuously
+
+Scene
 
 tile groups

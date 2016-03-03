@@ -1,4 +1,6 @@
 
+import tkFileDialog
+
 def do_key(host, e):
 
    # WANTED
@@ -17,9 +19,13 @@ def do_key(host, e):
    # can't pan around if canvas too small
    # load/save would make that less interesting
 
+   host.clear_highlights()
+
    shifty = bool(e.state&1)
 
    keysym = e.keysym
+
+   print 'key:',
 
    if shifty:
       print 'shift',
@@ -30,12 +36,23 @@ def do_key(host, e):
 
    # new tile
    # hold shift to keep active tile
+   # hold alt key to add debug info to messages
    # otherwise new tile becomes active
    if   keysym.lower() in ('q', 't'):
-      newtile = host.new_tile(e.keysym)
+      newtile = host.new_tile(e.keysym, bool(e.state&0x88))
 
       if newtile and not shifty:
          host.activate_tile(newtile)
+
+   if keysym.lower() == 'l':
+      fn = tkFileDialog.askopenfilename()
+      if fn:
+         host.load_scene(fn)
+
+   if keysym.lower() == 's':
+      fn = tkFileDialog.asksaveasfilename()
+      if fn:
+         host.save_scene(fn)
 
    # edges, ccw
    # hold shift to rotate scene fifteen degrees
@@ -89,3 +106,10 @@ def do_key(host, e):
    # show help window
    elif keysym in ('h', 'question', 'F1'):
       pass
+
+   elif keysym in ('plus', 'KP_Add'):
+      state['tile'][state['edge']].highlight_toggle()
+
+   # fill-in-the-blank debuging/test function, possibly ignored
+   elif keysym == 'KP_Begin':
+      host.trythis(e.state)

@@ -6,6 +6,8 @@ from commands import do_key
 from elements import *
 from options  import *
 from shapes   import *
+from ayeoh    import *
+
 
 class StatusItem(tk.Frame):
    def __init__(self, parent, label, **kwargs):
@@ -33,28 +35,96 @@ class TriSq(tk.Frame):
 
       scrfr.grid(row=0, column=0, sticky='nsew')
 
-      fr = tk.Frame(parent)
-
       self.status = \
       status = {}
 
-      status['q'] = w = StatusItem(fr, 'Squares:')
+      fr = tk.Frame(parent)
+
+      status[ 'q'] = w = StatusItem(fr, 'Squares:')
       w.grid(row=0, column=0, sticky='w')
 
-      status['t'] = w = StatusItem(fr, 'Triangles:', padx=6)
+      status[ 't'] = w = StatusItem(fr, 'Triangles:', padx=6)
       w.grid(row=0, column=1, sticky='w')
 
-      status['e'] = w = StatusItem(fr, 'Exposed Edges:', padx=6)
+      status['ee'] = w = StatusItem(fr, 'Exposed Edges:', padx=6)
       w.grid(row=0, column=2, sticky='w')
 
-      status['g'] = w = StatusItem(fr, 'Group:')
+      status[ 'g'] = w = StatusItem(fr, 'Group:')
       w.grid(row=0, column=3, sticky='e')
 
       fr.grid(row=1, column=0, sticky='ew')
 
       fr.columnconfigure(2, weight=1)
 
-   def new_tile(self, shape):
+      fr = tk.Frame(parent)
+
+      spc = tk.Frame(fr)
+      spc.grid(row=0, column=0, sticky='ew')
+
+      status['ae'] = w = StatusItem(fr, 'Active Edge:')
+      w.grid(row=0, column=1)
+
+      spc = tk.Frame(fr)
+      spc.grid(row=0, column=2, sticky='ew')
+
+      fr.grid(row=2, column=0, sticky='ew')
+
+      fr.columnconfigure(0, weight=1)
+      fr.columnconfigure(2, weight=1)
+
+   def trythis(self, modifiers=0):
+      tile = self.state['tile']
+      print 'active tile'
+      for e in tile:
+         print edge_print(e)
+
+      print 'to hex'
+      s = tile2hex(tile)
+      print s
+
+      print 'and back'
+      tile = hex2tile(s)
+      for e in tile:
+         print edge_print(e)
+
+      print 'any questions?'
+
+   def save_scene(self, fn):
+      with open(fn, 'wb') as f:
+         for tile in self.state['tiles']:
+            f.write('t %s\n' % (tile2hex(tile),))
+
+   def load_scene(self, fn):
+      state = self.state
+
+      for t in state['tiles']:
+         t.delete()
+
+      state.update(tiles=set(), edges={}, q=0, t=0)
+
+      with open(fn, 'rb') as f:
+         for ln in f:
+            s = ln.rstrip()
+
+            if not s:
+               continue
+
+            if s.startswith('#'):
+               continue
+
+            if s.startswith('t'):
+               self.add_tile(hex2tile(s[2:]))
+
+      tile = state['tiles'].copy().pop()
+      state['tile'] = tile
+      state['edge'] = 0
+
+      tile[0].activate()
+
+      tile.activate()
+
+
+   def new_tile(self, shape, debuggery):
       state = self.state
 
       tile  = state['tile']
@@ -70,7 +140,7 @@ class TriSq(tk.Frame):
       for e1 in rawedges:
          if not Edge.signature(*e1) in state['edges']:
             for e2 in state['edges'].itervalues():
-               if e2.intersect_check(e1):
+               if e2.intersect_check(e1, debuggery):
                   print 'overlap!'
                   return None
 
@@ -121,12 +191,12 @@ class TriSq(tk.Frame):
          e = edges[sign]
 
       else:
-         e = Edge(self.cvs, p1, p2, self.remove_edge)
+         e = Edge(self.cvs, p1, p2, self)
          edges[sign] = e
 
       return e
 
-   def remove_edge(self, e):
+   def edge_cleanup(self, e):
 
       edges = self.state['edges']
       sign = Edge.signature(*e)
@@ -170,6 +240,15 @@ class TriSq(tk.Frame):
       rmtile = edge.tile2 if edge.tile1 == tile else edge.tile1
 
       if rmtile:
+         if len(tile) == 4:
+            shape = 'q'
+         else:
+            shape = 't'
+
+         state[shape] -= 1
+
+         self.status[shape].update(state[shape])
+
          state['tiles'].remove(rmtile)
          rmtile.delete()
 
@@ -192,6 +271,14 @@ class TriSq(tk.Frame):
          if tile  == state['tile']:
             print 'oh noes!'
             oh_noes = True
+            tile[state['edge']].deactivate()
+
+         if len(tile) == 4:
+            shape = 'q'
+         else:
+            shape = 't'
+
+         state[shape] -= 1
 
          alltiles.remove(tile)
          tile.delete()
@@ -205,10 +292,41 @@ class TriSq(tk.Frame):
 
          tile.activate()
 
+      self.status['q'].update(state['q'])
+      self.status['t'].update(state['t'])
 
-   # tile0 is "q" or "t"
+   # e1, e2 may be a plain pair of Points
+   def highlight_edges(self, e1, e2, pt):
+
+      cvs = self.cvs
+      hilites = self.highlights
+
+      if hilites[0]:
+         cvs.delete(hilites[0])
+         cvs.delete(hilites[1])
+         cvs.delets(hilites[2])
+
+      hilites[0] = cvs.create_line(*e1, width=3, fill=HILIGHT_ERR)
+      hilites[1] = cvs.create_line(*e2, width=3, fill=HILIGHT_ERR)
+      hilites[2] = cvs.create_oval(pt.x-4, pt.y-4, pt.x+4, pt.y+4, width=0, fill=HILIGHT_ERR)
+
+   def clear_highlights(self):
+      hilites = self.highlights
+
+      if hilites[0] is None:
+         return
+
+      self.cvs.delete(hilites[0])
+      self.cvs.delete(hilites[1])
+      self.cvs.delete(hilites[2])
+
+      hilites[0] = hilites[1] = hilites[2] = None
+
+   # shape0 is "q" or "t"
    def __init__(self, parent, shape0, exitfxn=None):
       tk.Frame.__init__(self)
+
+      print 'initial tile:', shape0
 
       self.buildGUI(parent)
 
@@ -217,9 +335,11 @@ class TriSq(tk.Frame):
       self.rowconfigure(0, weight=1)
       self.columnconfigure(0, weight=1)
 
+      self.highlights = [None, None, None]
+
       self.state = {
-         'tiles' : set(), 'edges' : {}, 'q': 0,
-         'tile'  :  None, 'edge'  :  0, 't': 0
+         'tiles'  : set(), 'edges' : {}, 'q': 0,
+         'tile'   :  None, 'edge'  :  0, 't': 0,
       }
 
       self.state['tile'] = tile0 = self.add_tile(do_start_tile(shape0))

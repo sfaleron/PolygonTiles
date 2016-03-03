@@ -10,9 +10,13 @@ TILE_SIDE   =   50
 FILL = 'peru'
 EDGE = 'black'
 
-CURSOR = 'saddlebrown'
-SELECTED = 'rosybrown'
+CURSOR      = 'saddlebrown'
+HILIGHT_ERR = 'crimson'
+HILIGHT_USR = 'sandybrown'
+HI_N_ACTIVE = 'slategrey'
+SELECTED    = 'rosybrown'
 
 CSR_SCL = .7
 
 EPS = 1e-6
+FIXEDPT = 20
