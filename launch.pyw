@@ -1,4 +1,17 @@
 
+import os
+import os.path as osp
+
+from src import TriSq, SCENE_DIR
+
+d = osp.dirname(__file__)
+if d:
+   os.chdir(d)
+
+if not osp.exists(SCENE_DIR):
+   os.mkdir(SCENE_DIR)
+
+
 import Tkinter as tk
 
 import Pmw
@@ -35,7 +48,6 @@ def buildGUI(top):
    top.bind('t', set_choice)
    top.bind('l', set_choice)
 
-from src import TriSq
 
 top = tk.Tk()
 top.title('Starting Tile')
