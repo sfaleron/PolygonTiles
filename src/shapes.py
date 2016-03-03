@@ -16,10 +16,7 @@ def do_start_tile(shape):
       n  = 3
       da = pi/2
 
-   pts   = [Point(r*cos(a)+CX, r*sin(a)+CY) for a in [2*pi/n*i-da for i in range(n)]]
-
-   return [(pts[i], pts[i+1]) for i in range(n-1)] + [(pts[-1], pts[0])]
-
+   return [Point(r*cos(a)+CX, r*sin(a)+CY) for a in [2*pi/n*i-da for i in range(n)]]
 
 # the principle used is the same for both shapes: perpendicular lines are extended some distance.
 # for the square, one from each end; for the triangle, one from the midpoint.
@@ -51,7 +48,7 @@ def extend_line(pt, m, dsq):
 def make_tile(tile, edge, shape):
    p1, p2 = edge
 
-   other = (tile.pts - set(edge)).pop()
+   other = (set(tile.vertices) - set(edge)).pop()
 
    parent_side = edge.what_side(other)
 
@@ -71,13 +68,11 @@ def make_tile(tile, edge, shape):
 
       p4 = Point(p1.x+p3.x-p2.x, p1.y+p3.y-p2.y)
 
-      pts = (p4, p3, p2, p1)
+      return (p4, p3, p2, p1)
 
    else:
       sols3 = extend_line(centroid(p1, p2), m, .75*TILE_SIDE**2)
 
       p3    = sols3[1] if edge.what_side(sols3[1]) != parent_side else sols3[-1]
 
-      pts   = (p3, p2, p1)
-
-   return [(pts[i], pts[i+1]) for i in range(len(pts)-1)] + [(pts[-1], pts[0])]
+      return (p3, p2, p1)

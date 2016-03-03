@@ -1,6 +1,4 @@
 
-import tkFileDialog
-
 def do_key(host, e):
 
    # WANTED
@@ -44,15 +42,11 @@ def do_key(host, e):
       if newtile and not shifty:
          host.activate_tile(newtile)
 
-   if keysym.lower() == 'l':
-      fn = tkFileDialog.askopenfilename()
-      if fn:
-         host.load_scene(fn)
+   elif keysym.lower() == 'l':
+      host.load_scene()
 
-   if keysym.lower() == 's':
-      fn = tkFileDialog.asksaveasfilename()
-      if fn:
-         host.save_scene(fn)
+   elif keysym.lower() == 's':
+      host.save_scene()
 
    # edges, ccw
    # hold shift to rotate scene fifteen degrees

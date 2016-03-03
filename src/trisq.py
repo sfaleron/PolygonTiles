@@ -8,6 +8,13 @@ from options  import *
 from shapes   import *
 from ayeoh    import *
 
+import tkFileDialog
+
+fileDlgOpts = dict(initialdir=SCENE_DIR, defaultextension='.'+SCENE_EXT, filetypes=((SCENE_DESC, '*.'+SCENE_EXT),('All Files', '*')))
+
+
+def make_rawedges(vertices):
+   return [(vertices[i], vertices[i+1]) for i in range(len(vertices)-1)] + [(vertices[-1], vertices[0])]
 
 class StatusItem(tk.Frame):
    def __init__(self, parent, label, **kwargs):
@@ -83,18 +90,34 @@ class TriSq(tk.Frame):
       print s
 
       print 'and back'
-      tile = hex2tile(s)
-      for e in tile:
+      vertices = hex2vertices(s)
+      rawedges = make_rawedges(vertices)
+      for e in rawedges:
          print edge_print(e)
 
       print 'any questions?'
 
-   def save_scene(self, fn):
+   def save_scene(self, fn=None):
+      if fn is None:
+         fn = tkFileDialog.asksaveasfilename(**fileDlgOpts)
+         if not fn:
+            print 'save aborted'
+            return
+
+      print 'save', fn
+
       with open(fn, 'wb') as f:
          for tile in self.state['tiles']:
             f.write('t %s\n' % (tile2hex(tile),))
 
-   def load_scene(self, fn):
+   def load_scene(self, fn=None):
+      if fn is None:
+         fn = tkFileDialog.askopenfilename(**fileDlgOpts)
+         if not fn:
+            print 'load aborted'
+            return
+
+      print 'load', fn
       state = self.state
 
       for t in state['tiles']:
@@ -113,7 +136,10 @@ class TriSq(tk.Frame):
                continue
 
             if s.startswith('t'):
-               self.add_tile(hex2tile(s[2:]))
+               vertices = hex2vertices(s[2:])
+               rawedges = make_rawedges(vertices)
+               self.add_tile(vertices, rawedges)
+
 
       tile = state['tiles'].copy().pop()
       state['tile'] = tile
@@ -135,7 +161,8 @@ class TriSq(tk.Frame):
          print 'edge full!'
          return None
 
-      rawedges = make_tile(tile, edge, shape)
+      vertices = make_tile(tile, edge, shape)
+      rawedges = make_rawedges(vertices)
 
       for e1 in rawedges:
          if not Edge.signature(*e1) in state['edges']:
@@ -144,19 +171,19 @@ class TriSq(tk.Frame):
                   print 'overlap!'
                   return None
 
-      newtile = self.add_tile(rawedges)
+      newtile = self.add_tile(vertices, rawedges)
 
       self.cvs.tag_raise(edge.id_)
 
       return newtile
 
-   def add_tile(self, rawedges):
+   def add_tile(self, vertices, rawedges):
       st    = self.state
 
-      tile  = Tile(self.cvs, zip(*rawedges)[0], self.make_edges(rawedges))
+      tile  = Tile(self.cvs, vertices, self.make_edges(rawedges))
       st['tiles'].add(tile)
 
-      shape = 'q' if len(rawedges) == 4 else 't'
+      shape = 'q' if len(vertices) == 4 else 't'
 
       st[shape] += 1
       self.status[shape].update(st[shape])
@@ -322,7 +349,7 @@ class TriSq(tk.Frame):
 
       hilites[0] = hilites[1] = hilites[2] = None
 
-   # shape0 is "q" or "t"
+   # shape0 is "q", "t" or "l" to load from a file
    def __init__(self, parent, shape0, exitfxn=None):
       tk.Frame.__init__(self)
 
@@ -342,8 +369,15 @@ class TriSq(tk.Frame):
          'tile'   :  None, 'edge'  :  0, 't': 0,
       }
 
-      self.state['tile'] = tile0 = self.add_tile(do_start_tile(shape0))
+      if shape0 == 'l':
+         self.load_scene()
 
-      tile0[0].activate()
+      else:
+         vertices = do_start_tile(shape0)
+         rawedges = make_rawedges(vertices)
 
-      tile0.activate()
+         self.state['tile'] = tile0 = self.add_tile(vertices, rawedges)
+
+         tile0[0].activate()
+
+         tile0.activate()

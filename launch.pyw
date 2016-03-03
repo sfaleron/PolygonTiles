@@ -25,11 +25,15 @@ def buildGUI(top):
    lbl = tk.Label(top, text='T: triangle', font='Sans 12')
    lbl.grid(row=1, column=1, sticky='ew')
 
+   lbl = tk.Label(top, text='L: load scene', font='Sans 12')
+   lbl.grid(row=2, column=0, columnspan=2, sticky='ew')
+
    top.resizable(False, False)
 
    top.bind('<Escape>', lambda e: top.quit())
    top.bind('q', set_choice)
    top.bind('t', set_choice)
+   top.bind('l', set_choice)
 
 from src import TriSq
 
@@ -48,4 +52,6 @@ if choice:
    top.rowconfigure(0, weight=1)
    top.columnconfigure(0, weight=1)
 
-   top.mainloop()
+   # if the user selected load, but aborted, then just quit
+   if app.state['tiles']:
+      top.mainloop()

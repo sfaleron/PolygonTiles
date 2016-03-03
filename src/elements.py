@@ -196,25 +196,25 @@ class Edge(_Edge):
       return False
 
 class Tile(tuple):
-   def __new__(cls, cvs, pts, edges):
+   def __new__(cls, cvs, vertices, edges):
       self = super(Tile, cls).__new__(cls, edges)
 
       self.cvs = cvs
       self.group = None
       self.selected = False
-      self.pts = set(pts)
+      self.vertices = vertices
 
       for e in self:
          e.add_tile(self)
 
-      self.id_ = cvs.create_polygon(*pts, **{'fill':FILL, 'outline':EDGE})
+      self.id_ = cvs.create_polygon(*vertices, **{'fill':FILL, 'outline':EDGE})
 
       # scaled copy, to represent the cursor
-      cx, cy = centroid(*pts)
+      cx, cy = centroid(*vertices)
 
-      csrpts = [Point(CSR_SCL*(x-cx)+cx, CSR_SCL*(y-cy)+cy) for x,y in pts]
+      csrvertices = [Point(CSR_SCL*(x-cx)+cx, CSR_SCL*(y-cy)+cy) for x,y in vertices]
 
-      self.csrid = cvs.create_polygon(*csrpts, **{'fill':CURSOR, 'state':'hidden'})
+      self.csrid = cvs.create_polygon(*csrvertices, **{'fill':CURSOR, 'state':'hidden'})
 
       return self
 

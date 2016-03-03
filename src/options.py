@@ -20,3 +20,7 @@ CSR_SCL = .7
 
 EPS = 1e-6
 FIXEDPT = 20
+
+SCENE_DIR  = 'scenes'
+SCENE_EXT  = 'fp'
+SCENE_DESC = 'Foundation Plans'
