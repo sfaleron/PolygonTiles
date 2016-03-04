@@ -1,16 +1,100 @@
-Requried to run the source code
 
-- Python 2.7          http://www.python.org/
-- Python MegaWidgets  http://pmw.sourceforge.net/
+===============
+Getting Started
+===============
 
-The recommended way to get Pmw is with with the pip python package installer:
+Introduction
+------------
+
+This is an editor for combining adjoining polygonal shapes into patterns.
+Currently two shapes are included: squares and equilateral triangles, with
+equal side length. The immediate intended application is planning base
+foundations for the MMORPG Rust_, but the software's potential scope is
+more general than this.
+
+.. _Rust: https://playrust.com/
+
+This software is operated almost entirely by keyboard. The main mouse-oriented
+feature is activation of an arbitrary tile. Only neighboring tiles are available
+through keyboard navigation.
+
+This software is a work-in-progress. It is considered to be sufficiently
+useful and glitch-free to be presented publicly. Some intended features are
+not implemented, there are probably gaps in the documentation, and some
+aspects are not as aesthetically pleasing as would be preferred. No glitches
+or gotchas are present to my knowledge.
+
+
+Terminology
+-----------
+
+=============  ===============================================
+ Term           Definition
+=============  ===============================================
+ Tile           Polygon shape (square or equilateral triangle)
+ Edge           Tile's side, possibly shared between two tiles
+ Scene          The collection of all tiles
+ Active Tile    Tile cursor
+ Active Edge    Edge cursor
+ Selection      A highlighted subgroup of tiles
+=============  ===============================================
+
+
+Key Commands
+------------
+
++----------+-------------------------------------------+-------------------------+
+| Key      |  Effect                                   | Shifted Effect          |
++==========+===========================================+=========================+
+| q        |  Create a square tile                     | Active tile not changed |
++----------+-------------------------------------------+-------------------------+
+| t        |  Create a triangular tile                 | Active tile not changed |
++----------+-------------------------------------------+-------------------------+
+| Left     |  Rotate the active edge counter-clockwise |                         |
++----------+-------------------------------------------+-------------------------+
+| Right    |  Rotate the active edge clockwise         |                         |
++----------+-------------------------------------------+-------------------------+
+| | Keypad | | Set active tile to the tile across the  |                         |
+| | Insert | | active edge                             |                         |
++----------+-------------------------------------------+-------------------------+
+| Ctrl     |  Select/deselect the active tile          |                         |
++----------+-------------------------------------------+-------------------------+
+| Delete   |  Delete the tile across the active edge   | Delete selection        |
++----------+-------------------------------------------+-------------------------+
+| l        |  Load scene from a file                   |                         |
++----------+-------------------------------------------+-------------------------+
+| s        |  Save scene to a file                     |                         |
++----------+-------------------------------------------+-------------------------+
+| Escape   |  Exit program                             |                         |
++----------+-------------------------------------------+-------------------------+
+
+
+==========================
+Developers and Power Users
+==========================
+
+Required to run the source code directly:
+
+- `Python 2.7`_
+- `Python MegaWidgets`_
+
+.. _`Python 2.7`: http://www.python.org/
+.. _`Python MegaWidgets`: http://pmw.sourceforge.net/
+
+The recommended way to get Pmw is with with the pip_ python package installer:
 
   pip install pmw
 
-To build a windows executable, py2exe (http://www.py2exe.org/) is used, also obtained via pip:
+.. _pip: https://pip.pypa.io/
+
+To build a windows executable, py2exe_ is used, also obtained via pip:
 
   pip install py2exe
 
+.. _py2exe: http://www.py2exe.org/
+
+
+--------
 
 The home page for this project is:
-http://www.github.com/sfaleron/TriSq
+http://www.github.com/sfaleron/PolygonTiles
