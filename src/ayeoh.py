@@ -6,23 +6,38 @@ import struct
 def raw2hex(s):
    return ''.join(['%02x' % (ord(c),) for c in s])
 
-def pt2hex(pt):
-   return raw2hex(struct.pack('<2f', *pt))
-
-def tile2hex(t):
-   return ''.join(map(pt2hex, t.vertices))
-
-
 def hex2raw(s):
    return ''.join([chr(int(s[2*i:2*(i+1)], 16)) for i in range(len(s)/2)])
 
-def raw2pts(s):
-   nums = struct.unpack('<%df' % (len(s)/4,), s)
+
+def tile2hex(t):
+   return raw2hex(struct.pack('<%df' %(2*len(t),), *sum(t.vertices, ())))
+
+def hex2vertices(s):
+   nums = struct.unpack('<%df' % (len(s)/8,), hex2raw(s))
    return [Point(*nums[2*i:2*(i+1)]) for i in range(len(nums)/2)]
 
-# actually returns the vertices
-# this matches the other tile creation interfaces, naturally.
-def hex2vertices(s):
-   return raw2pts(hex2raw(s))
 
-__all__ = ('tile2hex', 'hex2vertices')
+def readfile(fd, cb):
+   for ln in fd:
+      s = ln.rstrip()
+
+      if not s:
+         continue
+
+      if s.startswith('#'):
+         continue
+
+      id_, args = s.split(' ', 1)
+
+      if id_ == 't':
+         cb('t', hex2vertices(s[2:]))
+
+
+def writefile(fd, items):
+   for id_, args in items:
+      if id_ == 't':
+         fd.write('t %s\n' % (tile2hex(args),))
+
+
+__all__ = ('writefile', 'readfile')

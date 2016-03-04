@@ -196,10 +196,11 @@ class Edge(_Edge):
       return False
 
 class Tile(tuple):
-   def __new__(cls, cvs, vertices, edges):
+   def __new__(cls, cvs, vertices, edges, host):
       self = super(Tile, cls).__new__(cls, edges)
 
       self.cvs = cvs
+      self.host = host
       self.group = None
       self.selected = False
       self.vertices = vertices
@@ -207,20 +208,36 @@ class Tile(tuple):
       for e in self:
          e.add_tile(self)
 
-      self.id_ = cvs.create_polygon(*vertices, **{'fill':FILL, 'outline':EDGE})
+      self.id_ = cvs.create_polygon(*vertices, **dict(fill=FILL, outline=EDGE, activestipple='gray12'))
 
       # scaled copy, to represent the cursor
       cx, cy = centroid(*vertices)
 
       csrvertices = [Point(CSR_SCL*(x-cx)+cx, CSR_SCL*(y-cy)+cy) for x,y in vertices]
 
-      self.csrid = cvs.create_polygon(*csrvertices, **{'fill':CURSOR, 'state':'hidden'})
+      self.csrid = cvs.create_polygon(*csrvertices, **dict(fill=CURSOR, state='hidden', activestipple='gray12'))
+
+      cvs.tag_bind(self.id_, '<ButtonPress-1>', self.onActivate)
+      cvs.tag_bind(self.csrid, '<ButtonPress-1>', self.onActivate)
 
       return self
 
    def select_toggle(self):
       self.selected = not self.selected
       self.cvs.itemconfigure(self.id_, fill=SELECTED if self.selected else FILL)
+
+   def onActivate(self, e):
+      state = self.host.state
+
+      state['tile'].deactivate()
+      state['tile'][state['edge']].deactivate()
+
+      state['tile'] = self
+      state['edge'] = 0
+
+      self[0].activate()
+
+      self.activate()
 
    def activate(self):
       self.cvs.itemconfigure(self.csrid, state='normal')

@@ -2,7 +2,7 @@
 import os
 import os.path as osp
 
-from src import TriSq, SCENE_DIR
+from src import TriSq, SCENE_DIR, APP_TITLE
 
 d = osp.dirname(__file__)
 if d:
@@ -57,7 +57,7 @@ top.destroy()
 
 if choice:
    top = Pmw.initialise(tk.Tk())
-   top.title('TriSq')
+   top.title(APP_TITLE)
    app = TriSq(top, choice.pop(), top.quit)
    app.grid(row=0, column=0, sticky='nsew')
 

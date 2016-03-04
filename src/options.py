@@ -24,3 +24,5 @@ FIXEDPT = 20
 SCENE_DIR  = 'scenes'
 SCENE_EXT  = 'fp'
 SCENE_DESC = 'Foundation Plans'
+
+APP_TITLE  = 'Foundation Planner'

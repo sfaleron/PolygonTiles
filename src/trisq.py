@@ -12,7 +12,6 @@ import tkFileDialog
 
 fileDlgOpts = dict(initialdir=SCENE_DIR, defaultextension='.'+SCENE_EXT, filetypes=((SCENE_DESC, '*.'+SCENE_EXT),('All Files', '*')))
 
-
 def make_rawedges(vertices):
    return [(vertices[i], vertices[i+1]) for i in range(len(vertices)-1)] + [(vertices[-1], vertices[0])]
 
@@ -100,19 +99,28 @@ class TriSq(tk.Frame):
    def save_scene(self, fn=None):
       if fn is None:
          fn = tkFileDialog.asksaveasfilename(**fileDlgOpts)
+
          if not fn:
             print 'save aborted'
             return
 
       print 'save', fn
 
+      tiles = self.state['tiles']
+
       with open(fn, 'wb') as f:
-         for tile in self.state['tiles']:
-            f.write('t %s\n' % (tile2hex(tile),))
+         writefile(f, zip(['t']*len(tiles), tiles))
+
+   def itemproc(self, id_, *args, **kwargs):
+      if id_ == 't':
+         vertices = args[0]
+         rawedges = make_rawedges(vertices)
+         self.add_tile(vertices, rawedges)
 
    def load_scene(self, fn=None):
       if fn is None:
          fn = tkFileDialog.askopenfilename(**fileDlgOpts)
+
          if not fn:
             print 'load aborted'
             return
@@ -126,20 +134,7 @@ class TriSq(tk.Frame):
       state.update(tiles=set(), edges={}, q=0, t=0)
 
       with open(fn, 'rb') as f:
-         for ln in f:
-            s = ln.rstrip()
-
-            if not s:
-               continue
-
-            if s.startswith('#'):
-               continue
-
-            if s.startswith('t'):
-               vertices = hex2vertices(s[2:])
-               rawedges = make_rawedges(vertices)
-               self.add_tile(vertices, rawedges)
-
+         readfile(f, self.itemproc)
 
       tile = state['tiles'].copy().pop()
       state['tile'] = tile
@@ -148,7 +143,6 @@ class TriSq(tk.Frame):
       tile[0].activate()
 
       tile.activate()
-
 
    def new_tile(self, shape, debuggery):
       state = self.state
@@ -180,7 +174,7 @@ class TriSq(tk.Frame):
    def add_tile(self, vertices, rawedges):
       st    = self.state
 
-      tile  = Tile(self.cvs, vertices, self.make_edges(rawedges))
+      tile  = Tile(self.cvs, vertices, self.make_edges(rawedges), self)
       st['tiles'].add(tile)
 
       shape = 'q' if len(vertices) == 4 else 't'
