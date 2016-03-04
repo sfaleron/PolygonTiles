@@ -35,8 +35,7 @@ Terminology
  Edge           Tile's side, possibly shared between two tiles
  Scene          The collection of all tiles
  Active Tile    Tile cursor
- Active Edge    Edge cursor
- Selection      A highlighted subgroup of tiles
+ Active Edge    Edge cursor, always an edge of the active tile
 =============  ===============================================
 
 
@@ -59,7 +58,7 @@ Interface
 +----------+-------------------------------------------+-------------------------+
 | Ctrl     |  Select/deselect the active tile          |                         |
 +----------+-------------------------------------------+-------------------------+
-| Delete   |  Delete the tile across the active edge   | Delete selection        |
+| Delete   |  Delete the tile across the active edge   | Delete selected tiles   |
 +----------+-------------------------------------------+-------------------------+
 | l        |  Load scene from a file                   |                         |
 +----------+-------------------------------------------+-------------------------+
@@ -105,6 +104,10 @@ To build a windows executable, py2exe_ is used, also obtained via pip:
 
 
 --------
+
+This software is licenced under the `Apache Public License, version 2.0`_
+
+.. _`Apache Public License, version 2.0`: http://www.apache.org/licenses/LICENSE-2.0
 
 The home page for this project is:
 http://www.github.com/sfaleron/PolygonTiles
