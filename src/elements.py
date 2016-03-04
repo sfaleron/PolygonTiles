@@ -68,8 +68,6 @@ class Edge(_Edge):
       self.cvs.tag_raise(self.id_)
 
    def activate(self):
-      self.host.status['ae'].update(edge_print(self))
-
       self.active = True
       self.update()
 
@@ -119,12 +117,13 @@ class Edge(_Edge):
    # other edge may be a plain pair of Points
    def intersect_check(self, other, debuggery):
 
-      if debuggery:
-         print 'DEBUGERRY BEGINS'
-         print edge_print(self)
-         print edge_print(other)
-
       host = self.host
+
+      if debuggery:
+         log = host.log
+         log('DEBUGERRY BEGINS')
+         log(edge_print(self))
+         log(edge_print(other))
 
       p1, p2 = self
       q1, q2 = other
@@ -140,23 +139,23 @@ class Edge(_Edge):
       # if the edges share an endpoint, that's an okay intersection
       if p1 == q1 or p1 == q2 or p2 == q1 or p2 == q2:
          if debuggery:
-            print 'early exit a'
-            print 'DEBUGERRY ENDS'
+            log('early exit a')
+            log('DEBUGERRY ENDS')
          return False
 
       # both edges are vertical
       if mp is None and mq is None:
          if debuggery:
-            print 'early exit b'
-            print 'DEBUGERRY ENDS'
+            log('early exit b')
+            log('DEBUGERRY ENDS')
          return False
 
       # neither side is vertical, but they are parallel
       if not mp is None and not mq is None:
          if abs(mp - mq) < EPS:
             if debuggery:
-               print 'early exit c'
-               print 'DEBUGERRY ENDS'
+               log('early exit c')
+               log('DEBUGERRY ENDS')
             return False
 
       # the lines defined by each edge do intersect, but perhaps not on the edges
@@ -170,7 +169,7 @@ class Edge(_Edge):
 
       px = Point(x, y)
       if debuggery:
-         print '%.1f,%.1f' % px
+         log('%.1f,%.1f' % px)
 
       p1x, p2x, p1y, p2y = scale_sort(p1, p2)
       q1x, q2x, q1y, q2y = scale_sort(q1, q2)
@@ -178,20 +177,20 @@ class Edge(_Edge):
       x, y = scale_to_ints(px)
 
       if debuggery:
-         print p1x, p1y, p2x, p2y
-         print q1x, q1y, q2x, q2y
-         print x, y
+         log(p1x, p1y, p2x, p2y)
+         log(q1x, q1y, q2x, q2y)
+         log(x, y)
 
       if p1x <= x <= p2x and q1x <= x <= q2x and p1y <= y <= p2y and q1y <= y <= q2y:
          host.highlight_edges(self, other, px)
          if debuggery:
-            print 'noncompliant intersection detected'
-            print 'DEBUGERRY ENDS'
+            log('noncompliant intersection detected')
+            log('DEBUGERRY ENDS')
          return True
 
       if debuggery:
-         print 'deemed okay'
-         print 'DEBUGERRY ENDS'
+         log('deemed okay')
+         log('DEBUGERRY ENDS')
 
       return False
 
@@ -208,21 +207,24 @@ class Tile(tuple):
       for e in self:
          e.add_tile(self)
 
-      self.id_ = cvs.create_polygon(*vertices, **dict(fill=FILL, outline=EDGE, activestipple='gray12'))
+      self.id_ = id1 = cvs.create_polygon(*vertices, **dict(fill=FILL, outline=EDGE, activestipple='gray12'))
 
       # scaled copy, to represent the cursor
       cx, cy = centroid(*vertices)
 
       csrvertices = [Point(CSR_SCL*(x-cx)+cx, CSR_SCL*(y-cy)+cy) for x,y in vertices]
 
-      self.csrid = cvs.create_polygon(*csrvertices, **dict(fill=CURSOR, state='hidden', activestipple='gray12'))
+      self.csrid = id2 = cvs.create_polygon(*csrvertices, **dict(fill=CURSOR, state='hidden', activestipple='gray12'))
 
-      cvs.tag_bind(self.id_, '<ButtonPress-1>', self.onActivate)
-      cvs.tag_bind(self.csrid, '<ButtonPress-1>', self.onActivate)
+      cvs.tag_bind(id1, '<ButtonPress-1>', self.onActivate)
+      cvs.tag_bind(id2, '<ButtonPress-1>', self.onActivate)
+
+      cvs.tag_bind(id1, '<ButtonPress-3>', self.select_toggle)
+      cvs.tag_bind(id2, '<ButtonPress-3>', self.select_toggle)
 
       return self
 
-   def select_toggle(self):
+   def select_toggle(self, e=None):
       self.selected = not self.selected
       self.cvs.itemconfigure(self.id_, fill=SELECTED if self.selected else FILL)
 

@@ -10,6 +10,12 @@ from ayeoh    import *
 
 import tkFileDialog
 
+from time import time
+
+import inspect
+
+import os.path as osp
+
 fileDlgOpts = dict(initialdir=SCENE_DIR, defaultextension='.'+SCENE_EXT, filetypes=((SCENE_DESC, '*.'+SCENE_EXT),('All Files', '*')))
 
 def make_rawedges(vertices):
@@ -62,49 +68,18 @@ class TriSq(tk.Frame):
 
       fr.columnconfigure(2, weight=1)
 
-      fr = tk.Frame(parent)
-
-      spc = tk.Frame(fr)
-      spc.grid(row=0, column=0, sticky='ew')
-
-      status['ae'] = w = StatusItem(fr, 'Active Edge:')
-      w.grid(row=0, column=1)
-
-      spc = tk.Frame(fr)
-      spc.grid(row=0, column=2, sticky='ew')
-
-      fr.grid(row=2, column=0, sticky='ew')
-
-      fr.columnconfigure(0, weight=1)
-      fr.columnconfigure(2, weight=1)
-
    def trythis(self, modifiers=0):
-      tile = self.state['tile']
-      print 'active tile'
-      for e in tile:
-         print edge_print(e)
-
-      print 'to hex'
-      s = tile2hex(tile)
-      print s
-
-      print 'and back'
-      vertices = hex2vertices(s)
-      rawedges = make_rawedges(vertices)
-      for e in rawedges:
-         print edge_print(e)
-
-      print 'any questions?'
+      pass
 
    def save_scene(self, fn=None):
       if fn is None:
          fn = tkFileDialog.asksaveasfilename(**fileDlgOpts)
 
          if not fn:
-            print 'save aborted'
+            self.log('save aborted')
             return
 
-      print 'save', fn
+      self.log('save: ' + fn)
 
       tiles = self.state['tiles']
 
@@ -122,10 +97,10 @@ class TriSq(tk.Frame):
          fn = tkFileDialog.askopenfilename(**fileDlgOpts)
 
          if not fn:
-            print 'load aborted'
+            self.log('load aborted')
             return
 
-      print 'load', fn
+      self.log('load: ' + fn)
       state = self.state
 
       for t in state['tiles']:
@@ -152,7 +127,7 @@ class TriSq(tk.Frame):
       edge  = tile[state['edge']]
 
       if edge.tile2:
-         print 'edge full!'
+         self.log('edge full!')
          return None
 
       vertices = make_tile(tile, edge, shape)
@@ -162,7 +137,7 @@ class TriSq(tk.Frame):
          if not Edge.signature(*e1) in state['edges']:
             for e2 in state['edges'].itervalues():
                if e2.intersect_check(e1, debuggery):
-                  print 'overlap!'
+                  self.log('overlap!')
                   return None
 
       newtile = self.add_tile(vertices, rawedges)
@@ -274,7 +249,7 @@ class TriSq(tk.Frame):
          rmtile.delete()
 
       else:
-         print 'no tile to delete'
+         self.log('no tile to delete')
 
    def do_delete_many(self):
       state    = self.state
@@ -283,14 +258,14 @@ class TriSq(tk.Frame):
       rmtiles  = [t for t in alltiles if t.selected]
 
       if len(alltiles) == len(rmtiles):
-         print 'at least one tile must remain!'
+         self.log('at least one tile must remain!')
          return
 
       oh_noes = False
 
       for tile in rmtiles:
          if tile  == state['tile']:
-            print 'oh noes!'
+            self.log('oh noes!')
             oh_noes = True
             tile[state['edge']].deactivate()
 
@@ -343,11 +318,32 @@ class TriSq(tk.Frame):
 
       hilites[0] = hilites[1] = hilites[2] = None
 
+   def log(self, *msgitems):
+      msg = ' '.join(map(str, msgitems))
+
+      s = time()-self.t0
+      h, s = divmod(s, 3600)
+      m, s = divmod(s, 60)
+
+      # as per https://docs.python.org/2/library/inspect.html#the-interpreter-stack
+      caller = inspect.stack()[1][0]
+      try:
+         info = inspect.getframeinfo(caller)
+      finally:
+         del caller
+
+      logentry = '%d:%02d:%02.1f [%s/%s:%d] %s' % ( h, m, s,
+         osp.basename(info.filename), info.function, info.lineno, msg )
+
+      print logentry
+
    # shape0 is "q", "t" or "l" to load from a file
    def __init__(self, parent, shape0, exitfxn=None):
       tk.Frame.__init__(self)
 
-      print 'initial tile:', shape0
+      self.t0 = time()
+
+      self.log('initial tile: ' + shape0)
 
       self.buildGUI(parent)
 

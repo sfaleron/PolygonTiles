@@ -23,12 +23,14 @@ def do_key(host, e):
 
    keysym = e.keysym
 
-   print 'key:',
+   msgbits = ['key:']
 
    if shifty:
-      print 'shift',
+      msgbits.append('shift')
 
-   print e.keysym
+   msgbits.append(e.keysym)
+
+   host.log(*msgbits)
 
    state = host.state
 

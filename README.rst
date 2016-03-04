@@ -14,15 +14,15 @@ more general than this.
 
 .. _Rust: https://playrust.com/
 
-This software is operated almost entirely by keyboard. The main mouse-oriented
-feature is activation of an arbitrary tile. Only neighboring tiles are available
-through keyboard navigation.
+This software is operated almost entirely by keyboard. Some mouse actions
+are supported. A summary of these functions is provided below.
 
 This software is a work-in-progress. It is considered to be sufficiently
 useful and glitch-free to be presented publicly. Some intended features are
 not implemented, there are probably gaps in the documentation, and some
 aspects are not as aesthetically pleasing as would be preferred. No glitches
-or gotchas are present to my knowledge.
+or gotchas are present to my knowledge, but there may be some lurking out of
+sight.
 
 
 Terminology
@@ -40,8 +40,8 @@ Terminology
 =============  ===============================================
 
 
-Key Commands
-------------
+Interface
+---------
 
 +----------+-------------------------------------------+-------------------------+
 | Key      |  Effect                                   | Shifted Effect          |
@@ -67,6 +67,16 @@ Key Commands
 +----------+-------------------------------------------+-------------------------+
 | Escape   |  Exit program                             |                         |
 +----------+-------------------------------------------+-------------------------+
+
+
++----------+------------------------------------------------+
+| | Mouse  | Effect                                         |
+| | Button |                                                |
++==========+================================================+
+| Left     | Activate tile under the mouse pointer          |
++----------+------------------------------------------------+
+| Right    | Select/deselect tile under the mouse pointer   |
++----------+------------------------------------------------+
 
 
 ==========================
