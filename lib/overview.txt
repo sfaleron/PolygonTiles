@@ -1,9 +1,0 @@
-Active Tile
-Active Edge
-"cursors"
-
-mouse click to change active tile discontinuously
-
-Scene
-
-tile groups
