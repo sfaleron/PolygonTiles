@@ -20,6 +20,8 @@ aspects are not as aesthetically pleasing as would be preferred. No glitches
 or gotchas are present to my knowledge, but there may be some lurking out of
 sight.
 
+Regular updates are expected for the spring of 2016. At some point, interest
+will wane, but I will attempt to keep this notice current.
 
 Terminology
 -----------
@@ -52,7 +54,7 @@ Interface
 | | Keypad | | Set active tile to the tile across the  |                         |
 | | Insert | | active edge                             |                         |
 +----------+-------------------------------------------+-------------------------+
-| Ctrl     |  Select/deselect the active tile          |                         |
+| Space    |  Select/deselect the active tile          |                         |
 +----------+-------------------------------------------+-------------------------+
 | Delete   |  Delete the tile across the active edge   | Delete selected tiles   |
 +----------+-------------------------------------------+-------------------------+
