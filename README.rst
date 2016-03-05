@@ -1,8 +1,4 @@
 
-===============
-Getting Started
-===============
-
 Introduction
 ------------
 
@@ -76,31 +72,6 @@ Interface
 +----------+------------------------------------------------+
 | Right    | Select/deselect tile under the mouse pointer   |
 +----------+------------------------------------------------+
-
-
-==========================
-Developers and Power Users
-==========================
-
-Required to run the source code directly:
-
-- `Python 2.7`_
-- `Python MegaWidgets`_
-
-.. _`Python 2.7`: http://www.python.org/
-.. _`Python MegaWidgets`: http://pmw.sourceforge.net/
-
-The recommended way to get Pmw is with with the pip_ python package installer:
-
-  pip install pmw
-
-.. _pip: https://pip.pypa.io/
-
-To build a windows executable, py2exe_ is used, also obtained via pip:
-
-  pip install py2exe
-
-.. _py2exe: http://www.py2exe.org/
 
 
 --------

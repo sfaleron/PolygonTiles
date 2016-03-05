@@ -1,0 +1,48 @@
+Required to run the source code directly:
+
+Python 2.7          http://www.python.org/
+Python MegaWidgets  http://pmw.sourceforge.net/
+
+To create a tidy zipfile with executable:
+
+PyInstaller         http://www.pyinstaller.org/
+
+Other links:
+
+pip documentation   https://pip.pypa.io/
+
+
+Pip, the Python Package Installer, is your friend. He is included with 
+the Python distribution, under the "Scripts" directory on Windows. On 
+Linux systems, pip should already be on your command line, as Python is 
+a standard system utility. You will need root permissions to use it, 
+however.
+
+Once Python is installed, use pip to obtain the other dependencies:
+
+Python MegaWidgets:
+pip install pmw
+
+PyInstaller:
+
+pip install pyinstaller
+
+
+To create a tidy bundle, a script is provided that invokes PyInstaller 
+and does a little post-processing to tidy up a bit and create the zipfile.
+
+python devbin/bundle.py
+
+The zipfile will appear in the bundles directory.
+
+There is one further note. Pmw as installed is not compatible with the 
+dependency detection that tools such as PyInstaller use. It comes with a 
+utility for this purpose, however. You should not need to use it, unless 
+a different version of Pmw, or the use of its color support, is desired. 
+The one included is v1.3.3.
+
+This is the command I used to bundle Pmw. The command for Linux or
+similar should be analagous.
+
+python \Python27\Lib\site-packages\Pmw\Pmw_1_3_3\bin\bundlepmw.py
+-nocolor -noblt \Python27\Lib\site-packages\Pmw\Pmw_1_3_3\lib

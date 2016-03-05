@@ -26,7 +26,7 @@ from ayeoh    import *
 
 import tkFileDialog
 
-from time import time
+from time import strftime, localtime, time
 
 import inspect
 
@@ -48,7 +48,7 @@ class StatusItem(tk.Frame):
    def update(self, val):
       self.field['text'] = str(val)
 
-class TriSq(tk.Frame):
+class PolyTiles(tk.Frame):
    def buildGUI(self, parent):
       self.scrfr = \
       scrfr = Pmw.ScrolledCanvas(parent, usehullsize=True,
@@ -358,7 +358,10 @@ class TriSq(tk.Frame):
       tk.Frame.__init__(self)
 
       self.t0 = time()
-
+      self.log('PolygonTiles starting up..')
+      with open(osp.join('lib', 'release'), 'rb') as f:
+         self.log('Release: ' + f.read().rstrip())
+      self.log('The timestamp is: ' + strftime('%Y.%m.%d.%H.%M', localtime(self.t0)))
       self.log('initial tile: ' + shape0)
 
       self.buildGUI(parent)

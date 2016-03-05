@@ -15,5 +15,5 @@
 # == limitations under the License.                                           ==
 # ==============================================================================
 
-from trisq import TriSq
+from polytiles import PolyTiles
 from options import *

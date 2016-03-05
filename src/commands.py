@@ -55,7 +55,7 @@ def do_key(host, e):
    # hold alt key to add debug info to messages
    # otherwise new tile becomes active
    if   keysym.lower() in ('q', 't'):
-      newtile = host.new_tile(e.keysym, bool(e.state&0x88))
+      newtile = host.new_tile(e.keysym, bool(e.state&4))
 
       if newtile and not shifty:
          host.activate_tile(newtile)
@@ -100,7 +100,7 @@ def do_key(host, e):
          f()
 
    # (un)select active tile
-   elif keysym in ('Control_R', 'Control_L'):
+   elif keysym == 'space':
       state['tile'].select_toggle()
 
    # delete the tile across active edge,

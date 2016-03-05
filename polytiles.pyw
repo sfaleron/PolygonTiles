@@ -17,7 +17,7 @@
 import os
 import os.path as osp
 
-from src import TriSq, SCENE_DIR, APP_TITLE
+from src import PolyTiles, SCENE_DIR, APP_TITLE
 
 d = osp.dirname(__file__)
 if d:
@@ -63,7 +63,6 @@ def buildGUI(top):
    top.bind('t', set_choice)
    top.bind('l', set_choice)
 
-
 top = tk.Tk()
 top.title('Starting Tile')
 buildGUI(top)
@@ -73,7 +72,7 @@ top.destroy()
 if choice:
    top = Pmw.initialise(tk.Tk())
    top.title(APP_TITLE)
-   app = TriSq(top, choice.pop(), top.quit)
+   app = PolyTiles(top, choice.pop(), top.quit)
    app.grid(row=0, column=0, sticky='nsew')
 
    top.rowconfigure(0, weight=1)

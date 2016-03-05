@@ -1,0 +1,15 @@
+What are these .rst files? They are reStructuredText (http://docutils.sourceforge.net/rst.html), a document format that is plaintext and human-interpretable. It is similar to Markdown (used by many blogging systems), but with better Python support.
+
+You can process these files with Docutils, but this is very heavyweight typesetting software, and you probably don't care about most of its features. A couple of alternatives are suggested:
+
+rst2html5
+https://bitbucket.org/andre_felipe_dias/rst2html5
+
+Obtain via:
+  pip install rst2html5
+
+rst2pdf
+http://rst2pdf.ralsina.me/stories/index.html might be slow or unreachable. Presumably, connectivity in Montenegro can be a little unreliable. There's also https://github.com/rst2pdf/rst2pdf or https://pypi.python.org/pypi/rst2pdf. It uses ReportLab, a professionally produced open source PDF library that isn't too hard on your free disk space.
+
+Obtain via:
+  pip install rst2pdf
