@@ -75,7 +75,7 @@ zipfd = zipfile.ZipFile(zipfn, 'w')
 for path, dirs, files in os.walk(src):
    for fn in files:
       pn = osp.join(path, fn)
-      zipfd.write(pn, osp.relpath(pn, 'dist'))
+      zipfd.write(pn, osp.join('PolygonTiles_r'+str(n), osp.relpath(pn, 'dist/polytiles/')))
 
 zipfd.close()
 

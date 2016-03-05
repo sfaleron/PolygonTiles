@@ -1,5 +1,5 @@
 /DEVNOTES
-/bundles
-/scenes
-/build
-/dist
+/bundles/
+/scenes/
+/build/
+/dist/
