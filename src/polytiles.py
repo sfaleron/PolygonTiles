@@ -28,7 +28,7 @@ import tkFileDialog
 
 from time import strftime, localtime, time
 
-import inspect
+import inspect, sys, ctypes
 
 import os.path as osp
 
@@ -90,6 +90,7 @@ class PolyTiles(tk.Frame):
    def save_scene(self, fn=None):
       if fn is None:
          fn = tkFileDialog.asksaveasfilename(**fileDlgOpts)
+         self.present()
 
          if not fn:
             self.log('save aborted')
@@ -111,6 +112,7 @@ class PolyTiles(tk.Frame):
    def load_scene(self, fn=None):
       if fn is None:
          fn = tkFileDialog.askopenfilename(**fileDlgOpts)
+         self.present()
 
          if not fn:
             self.log('load aborted')
@@ -353,6 +355,13 @@ class PolyTiles(tk.Frame):
 
       print logentry
 
+   # set the input focus to the window containing the instance
+   # only implemented on windows so far
+   def present(self):
+      if sys.platform == 'win32':
+         ctypes.windll.user32.SetFocus(self.native_toplevel)
+
+
    # shape0 is "q", "t" or "l" to load from a file
    def __init__(self, parent, shape0, exitfxn=None):
       tk.Frame.__init__(self)
@@ -362,7 +371,10 @@ class PolyTiles(tk.Frame):
       with open(osp.join('lib', 'release'), 'rb') as f:
          self.log('Release: ' + f.read().rstrip())
       self.log('The timestamp is: ' + strftime('%Y.%m.%d.%H.%M', localtime(self.t0)))
+      self.log('Platform reported as: ' + sys.platform)
       self.log('initial tile: ' + shape0)
+
+      self.native_toplevel = self.winfo_toplevel().winfo_id()
 
       self.buildGUI(parent)
 

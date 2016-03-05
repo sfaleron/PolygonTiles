@@ -80,4 +80,5 @@ if choice:
 
    # if the user selected load, but aborted, then just quit
    if app.state['tiles']:
+      app.present()
       top.mainloop()

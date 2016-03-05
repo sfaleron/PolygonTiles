@@ -27,7 +27,7 @@ FILL = 'peru'
 EDGE = 'black'
 
 CURSOR      = 'saddlebrown'
-HILIGHT_ERR = 'crimson'
+HILIGHT_ERR = 'orangered'
 HILIGHT_USR = 'sandybrown'
 HI_N_ACTIVE = 'slategrey'
 SELECTED    = 'rosybrown'
